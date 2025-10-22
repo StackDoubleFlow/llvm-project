@@ -117,8 +117,8 @@ extern "C" LLVM_ABI LLVM_EXTERNAL_VISIBILITY void LLVMInitializeURCLTargetMC() {
   //                                              createURCLObjectTargetStreamer);
 
   // Register the asm target streamer.
-  // TargetRegistry::RegisterAsmTargetStreamer(getTheURCLTarget(),
-  //                                           createMCAsmTargetStreamer);
+  TargetRegistry::RegisterAsmTargetStreamer(getTheURCLTarget(),
+                                            createMCAsmTargetStreamer);
 
   // Register the asm backend (as little endian).
   // TargetRegistry::RegisterMCAsmBackend(getTheURCLTarget(), createURCLAsmBackend);

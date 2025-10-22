@@ -10,12 +10,13 @@
 #include "TargetInfo/URCLTargetInfo.h"
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/Compiler.h"
-namespace llvm {
-Target &getTheURCLTarget() {
+
+using namespace llvm;
+
+Target &llvm::getTheURCLTarget() {
   static Target TheURCLTarget;
   return TheURCLTarget;
 }
-} // namespace llvm
 
 extern "C" LLVM_ABI LLVM_EXTERNAL_VISIBILITY void
 LLVMInitializeURCLTargetInfo() {

@@ -1,4 +1,4 @@
-//===-- URCLTargetMachine.cpp - Define TargetMachine for URCL ---------------===//
+//===-- URCLTargetMachine.cpp - Define TargetMachine for URCL -------------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -12,18 +12,16 @@
 
 #include "URCLTargetMachine.h"
 
+#include "MCTargetDesc/URCLMCTargetDesc.h"
+#include "TargetInfo/URCLTargetInfo.h"
+#include "URCL.h"
+#include "URCLMachineFunctionInfo.h"
+#include "URCLTargetTransformInfo.h"
 #include "llvm/CodeGen/Passes.h"
+#include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
 #include "llvm/CodeGen/TargetPassConfig.h"
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/Compiler.h"
-
-#include "URCL.h"
-#include "URCLMachineFunctionInfo.h"
-// #include "URCLTargetObjectFile.h"
-#include "URCLTargetTransformInfo.h"
-#include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
-#include "MCTargetDesc/URCLMCTargetDesc.h"
-#include "TargetInfo/URCLTargetInfo.h"
 
 #include <optional>
 
@@ -34,17 +32,17 @@ static Reloc::Model getEffectiveRelocModel(std::optional<Reloc::Model> RM) {
 }
 
 URCLTargetMachine::URCLTargetMachine(const Target &T, const Triple &TT,
-                                   StringRef CPU, StringRef FS,
-                                   const TargetOptions &Options,
-                                   std::optional<Reloc::Model> RM,
-                                   std::optional<CodeModel::Model> CM,
-                                   CodeGenOptLevel OL, bool JIT)
-    : CodeGenTargetMachineImpl(T, TT.computeDataLayout(), TT, CPU, FS,
-                               Options, getEffectiveRelocModel(RM),
+                                     StringRef CPU, StringRef FS,
+                                     const TargetOptions &Options,
+                                     std::optional<Reloc::Model> RM,
+                                     std::optional<CodeModel::Model> CM,
+                                     CodeGenOptLevel OL, bool JIT)
+    : CodeGenTargetMachineImpl(T, TT.computeDataLayout(), TT, CPU, FS, Options,
+                               getEffectiveRelocModel(RM),
                                getEffectiveCodeModel(CM, CodeModel::Small), OL),
+      TLOF(std::make_unique<TargetLoweringObjectFileELF>()),
       SubTarget(TT, std::string(CPU), std::string(FS), *this) {
-  // this->TLOF = std::make_unique<URCLTargetObjectFile>();
-  // initAsmInfo();
+  initAsmInfo();
 }
 
 namespace {
@@ -71,9 +69,7 @@ TargetPassConfig *URCLTargetMachine::createPassConfig(PassManagerBase &PM) {
   return new URCLPassConfig(*this, PM);
 }
 
-void URCLPassConfig::addIRPasses() {
-  TargetPassConfig::addIRPasses();
-}
+void URCLPassConfig::addIRPasses() { TargetPassConfig::addIRPasses(); }
 
 extern "C" LLVM_ABI LLVM_EXTERNAL_VISIBILITY void LLVMInitializeURCLTarget() {
   // Register the target.
@@ -88,7 +84,8 @@ const URCLSubtarget *URCLTargetMachine::getSubtargetImpl() const {
   return &SubTarget;
 }
 
-const URCLSubtarget *URCLTargetMachine::getSubtargetImpl(const Function &) const {
+const URCLSubtarget *
+URCLTargetMachine::getSubtargetImpl(const Function &) const {
   return &SubTarget;
 }
 
@@ -101,7 +98,7 @@ MachineFunctionInfo *URCLTargetMachine::createMachineFunctionInfo(
     BumpPtrAllocator &Allocator, const Function &F,
     const TargetSubtargetInfo *STI) const {
   return URCLMachineFunctionInfo::create<URCLMachineFunctionInfo>(Allocator, F,
-                                                                STI);
+                                                                  STI);
 }
 
 //===----------------------------------------------------------------------===//
@@ -116,9 +113,7 @@ bool URCLPassConfig::addInstSelector() {
   return false;
 }
 
-void URCLPassConfig::addPreSched2() {
-
-}
+void URCLPassConfig::addPreSched2() {}
 
 void URCLPassConfig::addPreEmitPass() {
   // Must run branch selection immediately preceding the asm printer.

@@ -111,7 +111,7 @@ public:
     renderscript64, // 64-bit RenderScript
     ve,             // NEC SX-Aurora Vector Engine
     urcl,           // Universal Reduced (or Redstone) Computer Language
-    LastArchType = ve
+    LastArchType = urcl
   };
   enum SubArchType {
     NoSubArch,

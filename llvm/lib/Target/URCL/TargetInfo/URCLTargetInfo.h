@@ -10,9 +10,11 @@
 #define LLVM_URCL_TARGET_INFO_H
 
 namespace llvm {
+
 class Target;
 
 Target &getTheURCLTarget();
+
 } // namespace llvm
 
 #endif // LLVM_URCL_TARGET_INFO_H
