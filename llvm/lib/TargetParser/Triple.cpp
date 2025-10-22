@@ -88,6 +88,7 @@ StringRef Triple::getArchTypeName(ArchType Kind) {
   case x86_64:         return "x86_64";
   case xcore:          return "xcore";
   case xtensa:         return "xtensa";
+  case urcl:           return "urcl";
   }
 
   llvm_unreachable("Invalid ArchType!");
@@ -1042,6 +1043,9 @@ static Triple::ObjectFormatType getDefaultFormat(const Triple &T) {
 
   case Triple::dxil:
     return Triple::DXContainer;
+
+  case Triple::urcl:
+    return Triple::UnknownObjectFormat;
   }
   llvm_unreachable("unknown architecture");
 }
@@ -1698,6 +1702,8 @@ unsigned Triple::getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
   case llvm::Triple::UnknownArch:
     return 0;
 
+  // TODO: this depends on the subtarget
+  case llvm::Triple::urcl:
   case llvm::Triple::avr:
   case llvm::Triple::msp430:
     return 16;
@@ -1809,6 +1815,7 @@ Triple Triple::get32BitArchVariant() const {
   case Triple::msp430:
   case Triple::systemz:
   case Triple::ve:
+  case Triple::urcl:
     T.setArch(UnknownArch);
     break;
 
@@ -1901,6 +1908,7 @@ Triple Triple::get64BitArchVariant() const {
   case Triple::tcele:
   case Triple::xcore:
   case Triple::xtensa:
+  case Triple::urcl:
     T.setArch(UnknownArch);
     break;
 

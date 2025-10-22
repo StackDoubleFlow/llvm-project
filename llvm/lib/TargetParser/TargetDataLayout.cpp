@@ -541,6 +541,8 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
     return "e-m:e-p:32:32-i1:8:32-i8:8:32-i16:16:32-i32:32:32-"
            "f32:32:32-i64:32-f64:32-a:0:32-n32";
   case Triple::avr:
+  // TODO: URCL data layout needs to be computed from subtarget options
+  case Triple::urcl:
     return "e-P1-p:16:8-i8:8-i16:8-i32:8-i64:8-f32:8-f64:8-n8:16-a:8";
   case Triple::bpfel:
   case Triple::bpfeb:
